@@ -30,7 +30,7 @@
 #include "imxrt_lcd.h"
 #include "imxrt_gpio.h"
 
-#include "imxrt1050-evk.h"
+#include "imxrt1052-evk.h"
 
 /****************************************************************************
  * Public Functions

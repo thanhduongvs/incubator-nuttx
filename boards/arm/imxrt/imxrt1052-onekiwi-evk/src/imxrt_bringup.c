@@ -38,7 +38,7 @@
 #  include "imxrt_usdhc.h"
 #endif
 
-#include "imxrt1050-evk.h"
+#include "imxrt1052-evk.h"
 
 #include <arch/board/board.h>  /* Must always be included last */
 

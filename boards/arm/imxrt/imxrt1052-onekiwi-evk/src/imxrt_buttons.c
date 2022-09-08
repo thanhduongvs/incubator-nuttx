@@ -35,7 +35,7 @@
 #include "imxrt_config.h"
 #include "imxrt_irq.h"
 #include "imxrt_gpio.h"
-#include "imxrt1050-evk.h"
+#include "imxrt1052-evk.h"
 
 #ifdef CONFIG_ARCH_BUTTONS
 

@@ -37,7 +37,7 @@
 #include "chip.h"
 
 #include <imxrt_gpio.h>
-#include "imxrt1050-evk.h"
+#include "imxrt1052-evk.h"
 
 #if defined(CONFIG_DEV_GPIO) && !defined(CONFIG_GPIO_LOWER_HALF)
 

@@ -36,7 +36,7 @@
 #include "imxrt_config.h"
 #include "imxrt_lpspi.h"
 #include "imxrt_gpio.h"
-#include "imxrt1050-evk.h"
+#include "imxrt1052-evk.h"
 
 #if defined(CONFIG_IMXRT_LPSPI1) || defined(CONFIG_IMXRT_LPSPI2) || \
     defined(CONFIG_IMXRT_LPSPI3) || defined(CONFIG_IMXRT_LPSPI4)

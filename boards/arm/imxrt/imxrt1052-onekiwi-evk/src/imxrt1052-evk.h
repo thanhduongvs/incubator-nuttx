@@ -1,5 +1,5 @@
 /****************************************************************************
- * boards/arm/imxrt/imxrt1050-evk/src/imxrt1050-evk.h
+ * boards/arm/imxrt/imxrt1050-evk/src/imxrt1052-evk.h
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with

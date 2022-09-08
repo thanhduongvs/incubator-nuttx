@@ -28,7 +28,7 @@
 #include <arch/board/board.h>
 
 #include "imxrt_start.h"
-#include "imxrt1050-evk.h"
+#include "imxrt1052-evk.h"
 
 /****************************************************************************
  * Public Functions

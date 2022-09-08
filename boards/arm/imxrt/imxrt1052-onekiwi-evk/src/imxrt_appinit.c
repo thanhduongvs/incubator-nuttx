@@ -28,7 +28,7 @@
 
 #include <nuttx/board.h>
 
-#include "imxrt1050-evk.h"
+#include "imxrt1052-evk.h"
 
 #ifdef CONFIG_BOARDCTL
 
