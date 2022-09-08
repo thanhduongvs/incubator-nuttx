@@ -42,7 +42,7 @@
 
 /* LEDs */
 
-#define GPIO_LED        (GPIO_OUTPUT | IOMUX_LED_DEFAULT | \
+#define GPIO_LED1        (GPIO_OUTPUT | IOMUX_LED_DEFAULT | \
                          GPIO_OUTPUT_ZERO | GPIO_PORT1 | GPIO_PIN9)       /* AD_BO_09 */
 
 /* Buttons ******************************************************************/
