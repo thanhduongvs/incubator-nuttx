@@ -54,10 +54,6 @@ ifeq ($(CONFIG_IMXRT_LCD),y)
 CSRCS += imxrt_lcd.c
 endif
 
-ifeq ($(CONFIG_MMCSD_SPI),y)
-CSRCS += imxrt_mmcsd_spi.c
-endif
-
 ifeq ($(CONFIG_DEV_GPIO),y)
 CSRCS += imxrt_gpio.c
 endif
