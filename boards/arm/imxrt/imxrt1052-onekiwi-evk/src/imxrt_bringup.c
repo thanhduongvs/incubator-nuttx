@@ -37,7 +37,8 @@
 #ifdef CONFIG_IMXRT_USDHC
 #  include "imxrt_usdhc.h"
 #endif
-
+#include "imxrt_periphclks.h"
+#include "hardware/imxrt_pinmux.h"
 #include "imxrt1052-evk.h"
 
 #include <arch/board/board.h>  /* Must always be included last */
@@ -113,6 +114,53 @@ static int nsh_sdmmc_initialize(void)
 #  define nsh_sdmmc_initialize() (OK)
 #endif
 
+static int imxrt_semc_initialize(void)
+{
+  imxrt_config_gpio(GPIO_SEMC_DATA00);
+  imxrt_config_gpio(GPIO_SEMC_DATA01);
+  imxrt_config_gpio(GPIO_SEMC_DATA02);
+  imxrt_config_gpio(GPIO_SEMC_DATA03);
+  imxrt_config_gpio(GPIO_SEMC_DATA04);
+  imxrt_config_gpio(GPIO_SEMC_DATA05);
+  imxrt_config_gpio(GPIO_SEMC_DATA06);
+  imxrt_config_gpio(GPIO_SEMC_DATA07);
+  imxrt_config_gpio(GPIO_SEMC_DM00);
+  imxrt_config_gpio(GPIO_SEMC_WE);
+  imxrt_config_gpio(GPIO_SEMC_CAS);
+  imxrt_config_gpio(GPIO_SEMC_RAS);
+  imxrt_config_gpio(GPIO_SEMC_CS0);
+  imxrt_config_gpio(GPIO_SEMC_BA0);
+  imxrt_config_gpio(GPIO_SEMC_BA1);
+  imxrt_config_gpio(GPIO_SEMC_ADDR10);
+  imxrt_config_gpio(GPIO_SEMC_ADDR00);
+  imxrt_config_gpio(GPIO_SEMC_ADDR01);
+  imxrt_config_gpio(GPIO_SEMC_ADDR02);
+  imxrt_config_gpio(GPIO_SEMC_ADDR03);
+  imxrt_config_gpio(GPIO_SEMC_ADDR04);
+  imxrt_config_gpio(GPIO_SEMC_ADDR05);
+  imxrt_config_gpio(GPIO_SEMC_ADDR06);
+  imxrt_config_gpio(GPIO_SEMC_ADDR07);
+  imxrt_config_gpio(GPIO_SEMC_ADDR08);
+  imxrt_config_gpio(GPIO_SEMC_ADDR09);
+  imxrt_config_gpio(GPIO_SEMC_ADDR11);
+  imxrt_config_gpio(GPIO_SEMC_ADDR12);
+  imxrt_config_gpio(GPIO_SEMC_DQS);
+  imxrt_config_gpio(GPIO_SEMC_CKE);
+  imxrt_config_gpio(GPIO_SEMC_CLK);
+  imxrt_config_gpio(GPIO_SEMC_DM01);
+  imxrt_config_gpio(GPIO_SEMC_DATA08);
+  imxrt_config_gpio(GPIO_SEMC_DATA09);
+  imxrt_config_gpio(GPIO_SEMC_DATA10);
+  imxrt_config_gpio(GPIO_SEMC_DATA11);
+  imxrt_config_gpio(GPIO_SEMC_DATA12);
+  imxrt_config_gpio(GPIO_SEMC_DATA13);
+  imxrt_config_gpio(GPIO_SEMC_DATA14);
+  imxrt_config_gpio(GPIO_SEMC_DATA15);
+  imxrt_config_gpio(GPIO_SEMC_CSX00);
+  imxrt_config_gpio(GPIO_SEMC_RDY);
+  imxrt_clockall_semc();
+  return 0;
+}
 /****************************************************************************
  * Public Functions
  ****************************************************************************/
@@ -133,6 +181,8 @@ int imxrt_bringup(void)
    * at least enough succeeded to bring-up NSH with perhaps reduced
    * capabilities.
    */
+  
+  imxrt_semc_initialize();
 
 #ifdef CONFIG_FS_PROCFS
   /* Mount the procfs file system */
