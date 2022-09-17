@@ -196,6 +196,8 @@ static inline uint32_t CLOCK_GetPllBypassRefClk(clock_pll_t pll)
  */
 static inline void CLOCK_SetMux(clock_mux_t mux, uint32_t value)
 {
+    uint32_t reg;
+#if 0
     uint32_t busyShift;
 
     busyShift               = (uint32_t)CCM_TUPLE_BUSY_SHIFT(mux);
@@ -208,14 +210,30 @@ static inline void CLOCK_SetMux(clock_mux_t mux, uint32_t value)
     if (CCM_NO_BUSY_WAIT != busyShift)
     {
         /* Wait until CCM internal handshake finish. */
-        while ((CCM->CDHIPR & ((1UL << busyShift))) != 0UL)
+        
+        while ((getreg32(IMXRT_CCM_CDHIPR) & ((1UL << busyShift))) != 0UL)
         {
         }
+    }
+#endif
+    switch(mux){
+        case kCLOCK_SemcMux:
+            reg = getreg32(IMXRT_CCM_CBCDR);
+            reg &= ~CCM_CBCDR_SEMC_CLK_SEL;
+            reg |= CCM_CBCDR_SEMC_PODF(CCM_PODF_FROM_DIVISOR(value));
+            putreg32(reg, IMXRT_CCM_CBCDR);
+
+            while ((getreg32(IMXRT_CCM_CDHIPR) & CCM_CDHIPR_SEMC_PODF_BUSY) != 0)
+            {
+            }
+            break;
     }
 }
 
 static inline void CLOCK_SetDiv(clock_div_t divider, uint32_t value)
 {
+    uint32_t reg;
+#if 0
     uint32_t busyShift;
 
     busyShift                   = CCM_TUPLE_BUSY_SHIFT(divider);
@@ -228,9 +246,23 @@ static inline void CLOCK_SetDiv(clock_div_t divider, uint32_t value)
     if (CCM_NO_BUSY_WAIT != busyShift)
     {
         /* Wait until CCM internal handshake finish. */
-        while ((CCM->CDHIPR & ((uint32_t)(1UL << busyShift))) != 0UL)
+        while ((getreg32(IMXRT_CCM_CDHIPR) & ((uint32_t)(1UL << busyShift))) != 0UL)
         {
         }
+    }
+#endif
+
+    switch(divider){
+        case kCLOCK_SemcDiv:
+            reg = getreg32(IMXRT_CCM_CBCDR);
+            reg &= ~CCM_CBCDR_SEMC_PODF_MASK;
+            reg |= CCM_CBCDR_SEMC_PODF(CCM_PODF_FROM_DIVISOR(value));
+            putreg32(reg, IMXRT_CCM_CBCDR);
+
+            while ((getreg32(IMXRT_CCM_CDHIPR) & CCM_CDHIPR_SEMC_PODF_BUSY) != 0)
+            {
+            }
+            break;
     }
 }
 
