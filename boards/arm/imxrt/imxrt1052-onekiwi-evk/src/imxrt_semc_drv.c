@@ -3,10 +3,12 @@
 #include <string.h>
 
 /*! @brief Pointers to SEMC bases for each instance. */
-static SEMC_Type *const s_semcBases[] = SEMC_BASE_PTRS;
+//static SEMC_Type *const s_semcBases[] = SEMC_BASE_PTRS;
 
+//static uint32_t const* s_semcBases[] = (uint32_t*)SEMC_BASE_PTRS;
 static uint32_t SEMC_GetInstance()
 {
+    #if 0
     uint32_t instance;
 
     /* Find the instance index from base address mappings. */
@@ -21,6 +23,9 @@ static uint32_t SEMC_GetInstance()
     assert(instance < ARRAY_SIZE(s_semcBases));
 
     return instance;
+    #endif
+    return 0x304;
+    
 }
 
 static status_t SEMC_CovertMemorySize(uint32_t size_kbytes, uint8_t *sizeConverted)
@@ -66,7 +71,7 @@ static uint8_t SEMC_ConvertTiming(uint32_t time_ns, uint32_t clkSrc_Hz)
     return (clockCycles == 0x00U) ? clockCycles : (clockCycles - 0x01U);
 }
 
-static status_t SEMC_IsIPCommandDone()
+static status_t SEMC_IsIPCommandDone(void)
 {
     uint32_t value;
     status_t status = kStatus_Success;
@@ -195,18 +200,19 @@ void SEMC_GetDefaultConfig(semc_config_t *config)
     queuebWeight->bankRotation     = SEMC_BMCR1_TYPICAL_WBR;
 }
 
+#include "imxrt_clock_drv.h"
 void SEMC_Init(semc_config_t *configure)
 {
     assert(configure != NULL);
 
-    uint8_t index = 0;
+    //uint8_t index = 0;
     uint32_t value;
 
 #if !(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL)
     /* Un-gate sdram controller clock. */
-    CLOCK_EnableClock(s_semcClock[SEMC_GetInstance(base)]);
+    CLOCK_EnableClock(s_semcClock[SEMC_GetInstance()]);
 #if (defined(SEMC_EXSC_CLOCKS))
-    CLOCK_EnableClock(s_semcExtClock[SEMC_GetInstance(base)]);
+    CLOCK_EnableClock(s_semcExtClock[SEMC_GetInstance()]);
 #endif /* SEMC_EXSC_CLOCKS */
 #endif /* FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL */
 

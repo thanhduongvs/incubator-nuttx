@@ -119,6 +119,14 @@ typedef enum _clock_div
     kCLOCK_NonePreDiv, /*!< None Pre div. */
 } clock_div_t;
 
+/*! @brief Clock gate value */
+typedef enum _clock_gate_value
+{
+    kCLOCK_ClockNotNeeded     = 0U, /*!< Clock is off during all modes. */
+    kCLOCK_ClockNeededRun     = 1U, /*!< Clock is on in run mode, but off in WAIT and STOP modes */
+    kCLOCK_ClockNeededRunWait = 3U, /*!< Clock is on during all modes, except STOP mode */
+} clock_gate_value_t;
+
 #define CLKPN_FREQ 0U
 
 #define CCM_ANALOG_PLL_BYPASS_SHIFT         (16U)

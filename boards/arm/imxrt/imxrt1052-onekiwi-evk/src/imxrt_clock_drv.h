@@ -8,6 +8,7 @@
 #include "hardware/imxrt_ccm.h"
 
 #include "imxrt_clock_type.h"
+#include "imxrt_common_drv.h"
 
 
 /*! @brief External XTAL (24M OSC/SYSOSC) clock frequency.
@@ -28,6 +29,23 @@ extern volatile uint32_t g_xtalFreq;
  * function CLOCK_SetRtcXtalFreq to set the value in to clock driver.
  */
 extern volatile uint32_t g_rtcXtalFreq;
+
+static inline void CLOCK_ControlGate(clock_ip_name_t name, clock_gate_value_t value)
+{
+    uint32_t index = ((uint32_t)name) >> 8U;
+    uint32_t shift = ((uint32_t)name) & 0x1FU;
+    volatile uint32_t *reg;
+
+    assert(index <= 6UL);
+
+    //reg = (volatile uint32_t *)(&(((volatile uint32_t *)&CCM->CCGR0)[index]));
+    //SDK_ATOMIC_LOCAL_CLEAR_AND_SET(reg, (3UL << shift), (((uint32_t)value) << shift));
+}
+
+static inline void CLOCK_EnableClock(clock_ip_name_t name)
+{
+    CLOCK_ControlGate(name, kCLOCK_ClockNeededRunWait);
+}
 
 /*!
  * @brief Check if PLL is enabled
