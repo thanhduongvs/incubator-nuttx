@@ -26,6 +26,8 @@ ifeq ($(CONFIG_IMXRT_SDRAMC),y)
 CSRCS += imxrt_sdram.c
 endif
 
+CSRCS += imxrt_clock_drv.c
+
 ifeq ($(CONFIG_BOARDCTL),y)
 CSRCS += imxrt_appinit.c imxrt_bringup.c
 else ifeq ($(CONFIG_BOARD_LATE_INITIALIZE),y)
