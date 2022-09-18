@@ -107,6 +107,11 @@ uint32_t CLOCK_GetSemcFreq(void)
 
 uint32_t CLOCK_GetPllFreq(clock_pll_t pll)
 {
+    #define MISC2_AUDIO_DIV_MSB_0U 0x00
+    #define MISC2_AUDIO_DIV_MSB_1U 0x800000
+    #define MISC2_AUDIO_DIV_LSB_0U 0x00
+    #define MISC2_AUDIO_DIV_LSB_1U 0x8000
+    
     uint32_t freq;
     uint32_t divSelect;
     uint32_t reg;
@@ -114,6 +119,8 @@ uint32_t CLOCK_GetPllFreq(clock_pll_t pll)
 
     clock_64b_t pll_num;
     clock_64b_t pll_demon;
+
+    uint32_t PLL_AUDIO_POST_DIV_SELECT_MASK = 0x180000;
 
     static const uint32_t enetRefClkFreq[] = {
         25000000U,  /* 25M */
@@ -140,7 +147,7 @@ uint32_t CLOCK_GetPllFreq(clock_pll_t pll)
     switch (pll)
     {
         case kCLOCK_PllArm:
-            reg = getreg32(IMXRT_CCM_ANALOG_PLL_ARM);
+            reg = READ_REG(IMXRT_CCM_ANALOG_PLL_ARM);
             freq = ((freq * ((reg & CCM_ANALOG_PLL_ARM_DIV_SELECT_MASK) >>
                              CCM_ANALOG_PLL_ARM_DIV_SELECT_SHIFT)) >>
                     1U);
@@ -148,13 +155,14 @@ uint32_t CLOCK_GetPllFreq(clock_pll_t pll)
 
         case kCLOCK_PllSys:
             /* PLL output frequency = Fref * (DIV_SELECT + NUM/DENOM). */
-            pll_num = (clock_64b_t)getreg32(IMXRT_CCM_ANALOG_PLL_SYS_NUM);
-            pll_demon = (clock_64b_t)getreg32(IMXRT_CCM_ANALOG_PLL_SYS_DENOM);
+            pll_num = (clock_64b_t)READ_REG(IMXRT_CCM_ANALOG_PLL_SYS_NUM);
+            pll_demon = (clock_64b_t)READ_REG(IMXRT_CCM_ANALOG_PLL_SYS_DENOM);
             freqTmp = ((clock_64b_t)freq * (pll_num));
             freqTmp /= pll_demon;
 
-            reg = getreg32(IMXRT_CCM_ANALOG_PLL_SYS);
-            if ((reg & CCM_ANALOG_PLL_SYS_DIV_SELECT_MASK) != 0U)
+            reg = READ_REG(IMXRT_CCM_ANALOG_PLL_SYS);
+            //CCM_ANALOG_PLL_SYS_DIV_SELECT_MASK = 1
+            if ((reg & 0x01) != 0U)
             {
                 freq *= 22U;
             }
@@ -167,18 +175,18 @@ uint32_t CLOCK_GetPllFreq(clock_pll_t pll)
             break;
 
         case kCLOCK_PllUsb1:
-            reg = getreg32(IMXRT_CCM_ANALOG_PLL_USB1);
+            reg = READ_REG(IMXRT_CCM_ANALOG_PLL_USB1);
             freq = (freq * (((reg & CCM_ANALOG_PLL_USB1_DIV_SELECT_MASK) != 0UL) ? 22U : 20U));
             break;
 
         case kCLOCK_PllAudio:
             /* PLL output frequency = Fref * (DIV_SELECT + NUM/DENOM). */
-            reg = getreg32(IMXRT_CCM_ANALOG_PLL_AUDIO);
+            reg = READ_REG(IMXRT_CCM_ANALOG_PLL_AUDIO);
             divSelect =
                 (reg & CCM_ANALOG_PLL_AUDIO_DIV_SELECT_MASK) >> CCM_ANALOG_PLL_AUDIO_DIV_SELECT_SHIFT;
 
-            pll_num = (clock_64b_t)getreg32(IMXRT_CCM_ANALOG_PLL_AUDIO_NUM);
-            pll_demon = (clock_64b_t)getreg32(IMXRT_CCM_ANALOG_PLL_AUDIO_DENOM);
+            pll_num = (clock_64b_t)READ_REG(IMXRT_CCM_ANALOG_PLL_AUDIO_NUM);
+            pll_demon = (clock_64b_t)READ_REG(IMXRT_CCM_ANALOG_PLL_AUDIO_DENOM);
             freqTmp = ((clock_64b_t)freq * (pll_num));
             freqTmp /= pll_demon;
 
@@ -200,18 +208,21 @@ uint32_t CLOCK_GetPllFreq(clock_pll_t pll)
              * 0x02: 1
              * 0x03: 4
              */
-            reg = getreg32(IMXRT_CCM_ANALOG_PLL_AUDIO);
-            switch (reg & CCM_ANALOG_PLL_AUDIO_POST_DIV_SELECT_MASK2)
+            reg = READ_REG(IMXRT_CCM_ANALOG_PLL_AUDIO);
+            switch (reg & PLL_AUDIO_POST_DIV_SELECT_MASK)
             {
-                case CCM_ANALOG_PLL_AUDIO_POST_DIV_SELECT2(0U):
+                //CCM_ANALOG_PLL_AUDIO_POST_DIV_SELECT(0)
+                case 0x00:
                     freq = freq >> 2U;
                     break;
 
-                case CCM_ANALOG_PLL_AUDIO_POST_DIV_SELECT2(1U):
+                //CCM_ANALOG_PLL_AUDIO_POST_DIV_SELECT(1)
+                case 0x80000:
                     freq = freq >> 1U;
                     break;
 
-                case CCM_ANALOG_PLL_AUDIO_POST_DIV_SELECT2(2U):
+                //CCM_ANALOG_PLL_AUDIO_POST_DIV_SELECT(1)
+                case 0x100000:
                     freq = freq >> 0U;
                     break;
 
@@ -220,19 +231,19 @@ uint32_t CLOCK_GetPllFreq(clock_pll_t pll)
                     break;
             }
 
-            reg = getreg32(IMXRT_CCM_ANALOG_MISC2);
+            reg = READ_REG(IMXRT_CCM_ANALOG_MISC2);
             switch (reg & (CCM_ANALOG_MISC2_AUDIO_DIV_MSB | CCM_ANALOG_MISC2_AUDIO_DIV_LSB))
             {
-                case CCM_ANALOG_MISC2_AUDIO_DIV_MSB2(1) | CCM_ANALOG_MISC2_AUDIO_DIV_LSB2(1):
+                case MISC2_AUDIO_DIV_MSB_1U | MISC2_AUDIO_DIV_LSB_1U:
                     freq >>= 2U;
                     break;
 
-                case CCM_ANALOG_MISC2_AUDIO_DIV_MSB2(0) | CCM_ANALOG_MISC2_AUDIO_DIV_LSB2(1):
+                case MISC2_AUDIO_DIV_MSB_0U | MISC2_AUDIO_DIV_LSB_1U:
                     freq >>= 1U;
                     break;
 
-                case CCM_ANALOG_MISC2_AUDIO_DIV_MSB2(0) | CCM_ANALOG_MISC2_AUDIO_DIV_LSB2(0):
-                case CCM_ANALOG_MISC2_AUDIO_DIV_MSB2(1) | CCM_ANALOG_MISC2_AUDIO_DIV_LSB2(0):
+                case MISC2_AUDIO_DIV_MSB_0U | MISC2_AUDIO_DIV_LSB_0U:
+                case MISC2_AUDIO_DIV_MSB_1U | MISC2_AUDIO_DIV_LSB_0U:
                     freq >>= 0U;
                     break;
 
@@ -244,12 +255,12 @@ uint32_t CLOCK_GetPllFreq(clock_pll_t pll)
 
         case kCLOCK_PllVideo:
             /* PLL output frequency = Fref * (DIV_SELECT + NUM/DENOM). */
-            reg = getreg32(IMXRT_CCM_ANALOG_PLL_VIDEO);
+            reg = READ_REG(IMXRT_CCM_ANALOG_PLL_VIDEO);
             divSelect =
                 (reg & CCM_ANALOG_PLL_VIDEO_DIV_SELECT_MASK) >> CCM_ANALOG_PLL_VIDEO_DIV_SELECT_SHIFT;
 
-            pll_num = (clock_64b_t)getreg32(IMXRT_CCM_ANALOG_PLL_VIDEO_NUM);
-            pll_demon = (clock_64b_t)getreg32(IMXRT_CCM_ANALOG_PLL_VIDEO_DENOM);
+            pll_num = (clock_64b_t)READ_REG(IMXRT_CCM_ANALOG_PLL_VIDEO_NUM);
+            pll_demon = (clock_64b_t)READ_REG(IMXRT_CCM_ANALOG_PLL_VIDEO_DENOM);
             freqTmp = ((clock_64b_t)freq * (pll_num));
             freqTmp /= pll_demon;
             freq = freq * divSelect + (uint32_t)freqTmp;
@@ -270,18 +281,22 @@ uint32_t CLOCK_GetPllFreq(clock_pll_t pll)
              * 0x02: 1
              * 0x03: 4
              */
-            reg = getreg32(IMXRT_CCM_ANALOG_PLL_VIDEO);
-            switch (reg & CCM_ANALOG_PLL_VIDEO_POST_DIV_SELECT_MASK)
+            reg = READ_REG(IMXRT_CCM_ANALOG_PLL_VIDEO);
+            // #define CCM_ANALOG_PLL_VIDEO_POST_DIV_SELECT_MASK (0x180000U)
+            switch (reg & 0x180000U)
             {
-                case CCM_ANALOG_PLL_VIDEO_POST_DIV_SELECT2(0U):
+                //CCM_ANALOG_PLL_VIDEO_POST_DIV_SELECT(0U) = 0x0
+                case 0x00:
                     freq = freq >> 2U;
                     break;
 
-                case CCM_ANALOG_PLL_VIDEO_POST_DIV_SELECT2(1U):
+                //CCM_ANALOG_PLL_VIDEO_POST_DIV_SELECT(1U) = 0x80000
+                case 0x80000:
                     freq = freq >> 1U;
                     break;
 
-                case CCM_ANALOG_PLL_VIDEO_POST_DIV_SELECT2(2U):
+                //CCM_ANALOG_PLL_VIDEO_POST_DIV_SELECT(2U) = 0x100000
+                case 0x100000:
                     freq = freq >> 0U;
                     break;
 
@@ -290,19 +305,21 @@ uint32_t CLOCK_GetPllFreq(clock_pll_t pll)
                     break;
             }
 
-            reg = getreg32(IMXRT_CCM_ANALOG_MISC2);
+            reg = READ_REG(IMXRT_CCM_ANALOG_MISC2);
             switch (reg & CCM_ANALOG_MISC2_VIDEO_DIV_MASK)
             {
-                case CCM_ANALOG_MISC2_VIDEO_DIV(3U):
+                // CCM_ANALOG_MISC2_VIDEO_DIV(3U) = 0xc0000000
+                case 0xc0000000:
                     freq >>= 2U;
                     break;
-
-                case CCM_ANALOG_MISC2_VIDEO_DIV(1U):
+                // CCM_ANALOG_MISC2_VIDEO_DIV(1U) = 0x40000000
+                case 0x40000000:
                     freq >>= 1U;
                     break;
-
-                case CCM_ANALOG_MISC2_VIDEO_DIV(0U):
-                case CCM_ANALOG_MISC2_VIDEO_DIV(2U):
+                //CCM_ANALOG_MISC2_VIDEO_DIV(0U) = 0x00
+                //CCM_ANALOG_MISC2_VIDEO_DIV(2U) = 0x80000000
+                case 0x00:
+                case 0x80000000:
                     freq >>= 0U;
                     break;
 
@@ -313,7 +330,7 @@ uint32_t CLOCK_GetPllFreq(clock_pll_t pll)
             break;
 
         case kCLOCK_PllEnet:
-            reg = getreg32(IMXRT_CCM_ANALOG_PLL_ENET);
+            reg = READ_REG(IMXRT_CCM_ANALOG_PLL_ENET);
             divSelect =
                 (reg & CCM_ANALOG_PLL_ENET_DIV_SELECT_MASK) >> CCM_ANALOG_PLL_ENET_DIV_SELECT_SHIFT;
             freq = enetRefClkFreq[divSelect];
@@ -325,8 +342,9 @@ uint32_t CLOCK_GetPllFreq(clock_pll_t pll)
             break;
 
         case kCLOCK_PllUsb2:
-            reg = getreg32(IMXRT_CCM_ANALOG_PLL_USB2);
-            freq = (freq * (((reg & CCM_ANALOG_PLL_USB2_DIV_SELECT_MASK) != 0U) ? 22U : 20U));
+            reg = READ_REG(IMXRT_CCM_ANALOG_PLL_USB2);
+            // CCM_ANALOG_PLL_USB2_DIV_SELECT_MASK = 0x02
+            freq = (freq * (((reg & 0x02) != 0U) ? 22U : 20U));
             break;
         default:
             freq = 0U;
@@ -340,7 +358,7 @@ uint32_t CLOCK_GetPllFreq(clock_pll_t pll)
 uint32_t CLOCK_GetUsb1PfdFreq(clock_pfd_t pfd)
 {
     uint32_t freq = CLOCK_GetPllFreq(kCLOCK_PllUsb1);
-    uint32_t reg = getreg32(IMXRT_CCM_ANALOG_PFD_480);
+    uint32_t reg = READ_REG(IMXRT_CCM_ANALOG_PFD_480);
     
     switch (pfd)
     {
@@ -372,8 +390,9 @@ uint32_t CLOCK_GetUsb1PfdFreq(clock_pfd_t pfd)
 
 uint32_t CLOCK_GetSysPfdFreq(clock_pfd_t pfd)
 {
+
     uint32_t freq = CLOCK_GetPllFreq(kCLOCK_PllSys);
-    uint32_t reg = getreg32(IMXRT_CCM_ANALOG_PFD_528);
+    uint32_t reg = READ_REG(IMXRT_CCM_ANALOG_PFD_528);
 
     switch (pfd)
     {
@@ -417,18 +436,18 @@ void CLOCK_InitSysPfd(clock_pfd_t pfd, uint8_t pfdFrac)
     uint32_t pfdIndex = (uint32_t)pfd;
     uint32_t pfd528;
     uint32_t value;
+    uint32_t PFD_528_PFD0_FRAC_MASK = 0x3F;
 
-    uint32_t reg = getreg32(IMXRT_CCM_ANALOG_PFD_528);
-    pfd528 = reg &
-             ~(((uint32_t)((uint32_t)CCM_ANALOG_PFD_528_PFD0_CLKGATE | CCM_ANALOG_PFD_528_PFD0_FRAC_MASK)
+    pfd528 = READ_REG(IMXRT_CCM_ANALOG_PFD_528) &
+             ~(((uint32_t)((uint32_t)CCM_ANALOG_PFD_528_PFD0_CLKGATE | PFD_528_PFD0_FRAC_MASK)
                 << (8UL * pfdIndex)));
 
     /* Disable the clock output first. */
     value = pfd528 | ((uint32_t)CCM_ANALOG_PFD_528_PFD0_CLKGATE << (8UL * pfdIndex));
-    putreg32(value, IMXRT_CCM_ANALOG_PFD_528);
+    WRITE_REG(IMXRT_CCM_ANALOG_PFD_528, value);
 
     /* Set the new value and enable output. */
     value = pfd528 | (CCM_ANALOG_PFD_528_PFD0_FRAC(pfdFrac) << (8UL * pfdIndex));
-    putreg32(value, IMXRT_CCM_ANALOG_PFD_528);
+    WRITE_REG(IMXRT_CCM_ANALOG_PFD_528, value);
 }
 
