@@ -456,6 +456,16 @@ config ARCH_BOARD_IMXRT1050_EVK
 		This is the board configuration for the port of NuttX to the NXP i.MXRT
 		evaluation kit, MIMXRT1050-EVKB.  This board features the MIMXRT1052DVL6A MCU.
 
+config ARCH_BOARD_IMXRT1052_THATICO
+	bool "NXP IMXRT1052 THATICO"
+	depends on ARCH_CHIP_MIMXRT1052DVL6A
+	select ARCH_HAVE_LEDS
+	select ARCH_HAVE_BUTTONS
+	select ARCH_HAVE_IRQBUTTONS
+	---help---
+		This is the board configuration for the port of NuttX to the NXP i.MXRT
+		evaluation kit, MIMXRT1050-EVKB.  This board features the MIMXRT1052DVL6A MCU.
+
 config ARCH_BOARD_IMXRT1052_ONEKIWI_EVK
 	bool "NXP i.MX RT 1052 ONEKIWI EVK"
 	depends on ARCH_CHIP_MIMXRT1052DVL6A
@@ -2447,6 +2457,7 @@ config ARCH_BOARD
 	default "hymini-stm32v"            if ARCH_BOARD_HYMINI_STM32V
 	default "imxrt1020-evk"            if ARCH_BOARD_IMXRT1020_EVK
 	default "imxrt1050-evk"            if ARCH_BOARD_IMXRT1050_EVK
+	default "imxrt1052-thatico"        if ARCH_BOARD_IMXRT1052_THATICO
 	default "imxrt1052-onekiwi-evk"    if ARCH_BOARD_IMXRT1052_ONEKIWI_EVK
 	default "imxrt1060-evk"            if ARCH_BOARD_IMXRT1060_EVK
 	default "imxrt1064-evk"            if ARCH_BOARD_IMXRT1064_EVK
@@ -2730,6 +2741,9 @@ source "boards/arm/imxrt/imxrt1020-evk/Kconfig"
 endif
 if ARCH_BOARD_IMXRT1050_EVK
 source "boards/arm/imxrt/imxrt1050-evk/Kconfig"
+endif
+if ARCH_BOARD_IMXRT1052_THATICO
+source "boards/arm/imxrt/imxrt1052-thatico/Kconfig"
 endif
 if ARCH_BOARD_IMXRT1052_ONEKIWI_EVK
 source "boards/arm/imxrt/imxrt1052-onekiwi-evk/Kconfig"
