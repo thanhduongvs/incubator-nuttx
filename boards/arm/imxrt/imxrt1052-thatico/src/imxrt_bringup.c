@@ -190,6 +190,7 @@ int imxrt_bringup(void)
 syslog(LOG_INFO, "IMXRT_CCM_CBCDR %lx\n", READ_REG(IMXRT_CCM_CBCDR));
 syslog(LOG_INFO, "IMXRT_CCM_ANALOG_PLL_ARM %lx\n", READ_REG(IMXRT_CCM_ANALOG_PLL_ARM));
 init_semc_sdram();
+SEMC_SDRAMReadWrite8Bit();
 //syslog(LOG_INFO, "CLOCK_GetSemcFreq %ld\n", CLOCK_GetSemcFreq());
 syslog(LOG_INFO, "= = = = = = 22. %s\n", __func__);
   UNUSED(ret);

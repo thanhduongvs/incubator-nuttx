@@ -30,16 +30,20 @@ extern volatile uint32_t g_xtalFreq;
  */
 extern volatile uint32_t g_rtcXtalFreq;
 
+
 static inline void CLOCK_ControlGate(clock_ip_name_t name, clock_gate_value_t value)
 {
     uint32_t index = ((uint32_t)name) >> 8U;
     uint32_t shift = ((uint32_t)name) & 0x1FU;
-    volatile uint32_t *reg;
+    uint32_t reg;
+    uint32_t temp;
 
-    assert(index <= 6UL);
+    assert(index <= 6);
 
-    //reg = (volatile uint32_t *)(&(((volatile uint32_t *)&CCM->CCGR0)[index]));
-    //SDK_ATOMIC_LOCAL_CLEAR_AND_SET(reg, (3UL << shift), (((uint32_t)value) << shift));
+    reg = IMXRT_CCM_CCGR0 + index;
+    temp = READ_REG(reg);
+    WRITE_REG(reg, (temp & ~(3U << shift)) | (((uint32_t)value) << shift));
+    //*reg = ((*reg) & ~(3U << shift)) | (((uint32_t)value) << shift);
 }
 
 static inline void CLOCK_EnableClock(clock_ip_name_t name)

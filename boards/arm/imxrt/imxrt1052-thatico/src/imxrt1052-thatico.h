@@ -136,6 +136,7 @@
 int imxrt_bringup(void);
 #endif
 uint32_t CLOCK_GetSemcFreq(void);
+void SEMC_SDRAMReadWrite8Bit(void);
 /****************************************************************************
  * Name: imxrt_spidev_initialize
  *

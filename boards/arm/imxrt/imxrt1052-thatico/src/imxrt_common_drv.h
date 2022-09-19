@@ -620,4 +620,119 @@ typedef enum _clock_ip_name
 
 } clock_ip_name_t;
 
+#define __ASM       __asm
+#define __STATIC_FORCEINLINE    __attribute__((always_inline)) static inline
+
+__STATIC_FORCEINLINE uint8_t __LDREXB(volatile uint8_t *addr)
+{
+    uint32_t result;
+
+#if (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)
+   __ASM volatile ("ldrexb %0, %1" : "=r" (result) : "Q" (*addr) );
+#else
+    /* Prior to GCC 4.8, "Q" will be expanded to [rx, #0] which is not
+       accepted by assembler. So has to use following less efficient pattern.
+    */
+   __ASM volatile ("ldrexb %0, [%1]" : "=r" (result) : "r" (addr) : "memory" );
+#endif
+   return ((uint8_t) result);    /* Add explicit type cast here */
+}
+
+__STATIC_FORCEINLINE uint32_t __STREXB(uint8_t value, volatile uint8_t *addr)
+{
+   uint32_t result;
+
+   __ASM volatile ("strexb %0, %2, %1" : "=&r" (result), "=Q" (*addr) : "r" ((uint32_t)value) );
+   return(result);
+}
+
+__STATIC_FORCEINLINE uint16_t __LDREXH(volatile uint16_t *addr)
+{
+    uint32_t result;
+
+#if (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)
+   __ASM volatile ("ldrexh %0, %1" : "=r" (result) : "Q" (*addr) );
+#else
+    /* Prior to GCC 4.8, "Q" will be expanded to [rx, #0] which is not
+       accepted by assembler. So has to use following less efficient pattern.
+    */
+   __ASM volatile ("ldrexh %0, [%1]" : "=r" (result) : "r" (addr) : "memory" );
+#endif
+   return ((uint16_t) result);    /* Add explicit type cast here */
+}
+
+__STATIC_FORCEINLINE uint32_t __STREXH(uint16_t value, volatile uint16_t *addr)
+{
+   uint32_t result;
+
+   __ASM volatile ("strexh %0, %2, %1" : "=&r" (result), "=Q" (*addr) : "r" ((uint32_t)value) );
+   return(result);
+}
+
+#define _SDK_ATOMIC_LOCAL_OPS_1BYTE(addr, val, ops) \
+    do                                              \
+    {                                               \
+        (val) = __LDREXB(addr);                     \
+        (ops);                                      \
+    } while (0UL != __STREXB((val), (addr)))
+
+#define _SDK_ATOMIC_LOCAL_OPS_2BYTE(addr, val, ops) \
+    do                                              \
+    {                                               \
+        (val) = __LDREXH(addr);                     \
+        (ops);                                      \
+    } while (0UL != __STREXH((val), (addr)))
+
+#define _SDK_ATOMIC_LOCAL_OPS_4BYTE(addr, val, ops) \
+    do                                              \
+    {                                               \
+        (val) = __LDREXW(addr);                     \
+        (ops);                                      \
+    } while (0UL != __STREXW((val), (addr)))
+
+
+__STATIC_FORCEINLINE uint32_t __LDREXW(volatile uint32_t *addr)
+{
+    uint32_t result;
+
+   __ASM volatile ("ldrex %0, %1" : "=r" (result) : "Q" (*addr) );
+   return(result);
+}
+
+__STATIC_FORCEINLINE uint32_t __STREXW(uint32_t value, volatile uint32_t *addr)
+{
+   uint32_t result;
+
+   __ASM volatile ("strex %0, %2, %1" : "=&r" (result), "=Q" (*addr) : "r" (value) );
+   return(result);
+}
+
+static inline void _SDK_AtomicLocalClearAndSet1Byte(volatile uint8_t *addr, uint8_t clearBits, uint8_t setBits)
+{
+    uint8_t s_val;
+
+    _SDK_ATOMIC_LOCAL_OPS_1BYTE(addr, s_val, s_val = (s_val & ~clearBits) | setBits);
+}
+
+static inline void _SDK_AtomicLocalClearAndSet2Byte(volatile uint16_t *addr, uint16_t clearBits, uint16_t setBits)
+{
+    uint16_t s_val;
+
+    _SDK_ATOMIC_LOCAL_OPS_2BYTE(addr, s_val, s_val = (s_val & ~clearBits) | setBits);
+}
+
+static inline void _SDK_AtomicLocalClearAndSet4Byte(volatile uint32_t *addr, uint32_t clearBits, uint32_t setBits)
+{
+    uint32_t s_val;
+
+    _SDK_ATOMIC_LOCAL_OPS_4BYTE(addr, s_val, s_val = (s_val & ~clearBits) | setBits);
+}
+
+#define SDK_ATOMIC_LOCAL_CLEAR_AND_SET(addr, clearBits, setBits)                                                                           \
+    ((1UL == sizeof(*(addr))) ?                                                                                                            \
+         _SDK_AtomicLocalClearAndSet1Byte((volatile uint8_t *)(volatile void *)(addr), (uint8_t)(clearBits), (uint8_t)(setBits)) :         \
+         ((2UL == sizeof(*(addr))) ?                                                                                                       \
+              _SDK_AtomicLocalClearAndSet2Byte((volatile uint16_t *)(volatile void *)(addr), (uint16_t)(clearBits), (uint16_t)(setBits)) : \
+              _SDK_AtomicLocalClearAndSet4Byte((volatile uint32_t *)(volatile void *)(addr), (uint32_t)(clearBits), (uint32_t)(setBits))))
+
 #endif /* __IMXRT_COMMON_DRV_H */
