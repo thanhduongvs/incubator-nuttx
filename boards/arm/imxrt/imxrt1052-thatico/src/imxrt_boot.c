@@ -29,6 +29,7 @@
 
 #include "imxrt_start.h"
 #include "imxrt1052-thatico.h"
+#include <syslog.h>
 
 /****************************************************************************
  * Public Functions
@@ -48,9 +49,10 @@
 void imxrt_boardinitialize(void)
 {
   /* Configure on-board LEDs if LED support has been selected. */
-
+syslog(LOG_INFO, "= = = = = = 1. %s\n", __func__);
 #ifdef CONFIG_ARCH_LEDS
   imxrt_autoled_initialize();
+  syslog(LOG_INFO, "= = = = = = 2. %s\n", __func__);
 #endif
 }
 
@@ -71,7 +73,13 @@ void imxrt_boardinitialize(void)
 void board_late_initialize(void)
 {
   /* Perform board initialization */
-
+  syslog(LOG_INFO, "= = = = = = 1. %s\n", __func__);
   imxrt_bringup();
+  syslog(LOG_INFO, "= = = = = = 2. %s\n", __func__);
 }
 #endif /* CONFIG_BOARD_LATE_INITIALIZE */
+
+//uint32_t semc;
+//syslog(LOG_INFO, "get_clock\n");
+//semc = CLOCK_GetSemcFreq();
+///syslog(LOG_INFO, "CLOCK_GetSemcFreq %ld\n", semc);

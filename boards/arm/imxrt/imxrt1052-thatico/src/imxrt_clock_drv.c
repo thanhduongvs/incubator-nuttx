@@ -1,6 +1,6 @@
 #include "imxrt_clock_drv.h"
 #include <assert.h>
-
+#include <syslog.h>
 /* External XTAL (OSC) clock frequency. */
 volatile uint32_t g_xtalFreq;
 /* External RTC XTAL clock frequency. */
@@ -13,26 +13,33 @@ static uint32_t CLOCK_GetPeriphClkFreq(void)
     uint32_t reg;
 
     /* Periph_clk2_clk ---> Periph_clk */
+    syslog(LOG_INFO, "IMXRT_CCM_CBCDR %lx\n", READ_REG(IMXRT_CCM_CBCDR));
     if (READ_BIT(IMXRT_CCM_CBCDR, CCM_CBCDR_PERIPH_CLK_SEL_MASK) != 0U)
-    {
+    {   
+        syslog(LOG_INFO, "ha1\n");
+        syslog(LOG_INFO, "IMXRT_CCM_CBCMR %lx\n", READ_REG(IMXRT_CCM_CBCMR));
         switch (READ_BIT(IMXRT_CCM_CBCMR, CCM_CBCMR_PERIPH_CLK2_SEL_MASK))
         {
             /* Pll3_sw_clk ---> Periph_clk2_clk ---> Periph_clk */
             case CCM_CBCMR_PERIPH_CLK2_SEL(0U):
+                syslog(LOG_INFO, "ha2\n");
                 freq = CLOCK_GetPllFreq(kCLOCK_PllUsb1);
                 break;
 
             /* Osc_clk ---> Periph_clk2_clk ---> Periph_clk */
             case CCM_CBCMR_PERIPH_CLK2_SEL(1U):
+                syslog(LOG_INFO, "ha3\n");
                 freq = CLOCK_GetOscFreq();
                 break;
 
             case CCM_CBCMR_PERIPH_CLK2_SEL(2U):
+                syslog(LOG_INFO, "ha4\n");
                 freq = CLOCK_GetPllFreq(kCLOCK_PllSys);
                 break;
 
             case CCM_CBCMR_PERIPH_CLK2_SEL(3U):
             default:
+                syslog(LOG_INFO, "ha5\n");
                 freq = 0U;
                 break;
         }
@@ -40,26 +47,36 @@ static uint32_t CLOCK_GetPeriphClkFreq(void)
     }
     /* Pre_Periph_clk ---> Periph_clk */
     else
-    {
+    {   
+        syslog(LOG_INFO, "ha6\n");
+        syslog(LOG_INFO, "IMXRT_CCM_CBCMR %lx\n", READ_REG(IMXRT_CCM_CBCMR));
         switch (READ_BIT(IMXRT_CCM_CBCMR, CCM_CBCMR_PRE_PERIPH_CLK_SEL_MASK))
         {
             /* PLL2 ---> Pre_Periph_clk ---> Periph_clk */
+             
             case CCM_CBCMR_PRE_PERIPH_CLK_SEL(0U):
+            syslog(LOG_INFO, "ha7\n");
                 freq = CLOCK_GetPllFreq(kCLOCK_PllSys);
                 break;
 
             /* PLL2 PFD2 ---> Pre_Periph_clk ---> Periph_clk */
+             
             case CCM_CBCMR_PRE_PERIPH_CLK_SEL(1U):
+            syslog(LOG_INFO, "ha8\n");
                 freq = CLOCK_GetSysPfdFreq(kCLOCK_Pfd2);
                 break;
 
             /* PLL2 PFD0 ---> Pre_Periph_clk ---> Periph_clk */
             case CCM_CBCMR_PRE_PERIPH_CLK_SEL(2U):
+             syslog(LOG_INFO, "ha9\n");
                 freq = CLOCK_GetSysPfdFreq(kCLOCK_Pfd0);
                 break;
 
             /* PLL1 divided(/2) ---> Pre_Periph_clk ---> Periph_clk */
             case CCM_CBCMR_PRE_PERIPH_CLK_SEL(3U):
+                syslog(LOG_INFO, "ha10\n");
+                syslog(LOG_INFO, "IMXRT_CCM_CACRR %lx\n", READ_REG(IMXRT_CCM_CACRR));
+                syslog(LOG_INFO, "IMXRT_CCM_ANALOG_PLL_ARM %lx\n", READ_REG(IMXRT_CCM_ANALOG_PLL_ARM));
                 reg = READ_REG(IMXRT_CCM_CACRR);
                 // CCM_CACRR_ARM_PODF_MASK = 0x07
                 freq = CLOCK_GetPllFreq(kCLOCK_PllArm) /
@@ -67,6 +84,7 @@ static uint32_t CLOCK_GetPeriphClkFreq(void)
                 break;
 
             default:
+            syslog(LOG_INFO, "ha11\n");
                 freq = 0U;
                 break;
         }
@@ -79,29 +97,35 @@ uint32_t CLOCK_GetSemcFreq(void)
 {
     uint32_t freq;
     uint32_t CBCDR_SEMC_PODF_MASK = 0x70000;
+    syslog(LOG_INFO, "= = = = = = 1zx. %s\n", __func__);
 
+    syslog(LOG_INFO, "IMXRT_CCM_CBCDR %lx\n", READ_REG(IMXRT_CCM_CBCDR));
     /* SEMC alternative clock ---> SEMC Clock */
     if (READ_BIT(IMXRT_CCM_CBCDR, CCM_CBCDR_SEMC_CLK_SEL) != 0U)
     {
+        syslog(LOG_INFO, "a1\n");
         /* PLL3 PFD1 ---> SEMC alternative clock ---> SEMC Clock */
         if (READ_BIT(IMXRT_CCM_CBCDR, CCM_CBCDR_SEMC_ALT_CLK_SEL) != 0U)
         {
+            syslog(LOG_INFO, "a2\n");
             freq = CLOCK_GetUsb1PfdFreq(kCLOCK_Pfd1);
         }
         /* PLL2 PFD2 ---> SEMC alternative clock ---> SEMC Clock */
         else
         {
+            syslog(LOG_INFO, "a3\n");
             freq = CLOCK_GetSysPfdFreq(kCLOCK_Pfd2);
         }
     }
     /* Periph_clk ---> SEMC Clock */
     else
     {
+        syslog(LOG_INFO, "a4\n");
         freq = CLOCK_GetPeriphClkFreq();
     }
-
+    syslog(LOG_INFO, "a5\n");
     freq /= ((READ_BIT(IMXRT_CCM_CBCDR, CBCDR_SEMC_PODF_MASK) >> CCM_CBCDR_SEMC_PODF_SHIFT) + 1U);
-
+    syslog(LOG_INFO, "= = = = = = 2zx. %s\n", __func__);
     return freq;
 }
 

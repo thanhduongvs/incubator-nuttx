@@ -61,35 +61,35 @@ static inline bool CLOCK_IsPllEnabled(clock_pll_t pll)
     uint32_t reg = 0;
     switch(pll){    
     case kCLOCK_PllArm:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_ARM);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_ARM);
         result = ((reg & CCM_ANALOG_PLL_ARM_ENABLE) != 0U);
         break;
     case kCLOCK_PllSys:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_SYS);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_SYS);
         result = ((reg & CCM_ANALOG_PLL_SYS_ENABLE) != 0U);
         break;
     case kCLOCK_PllUsb1:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_USB1);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_USB1);
         result = ((reg & CCM_ANALOG_PLL_USB1_ENABLE) != 0U);
         break;
     case kCLOCK_PllAudio:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_AUDIO);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_AUDIO);
         result = ((reg & CCM_ANALOG_PLL_AUDIO_ENABLE) != 0U);
         break;
     case kCLOCK_PllVideo:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_VIDEO);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_VIDEO);
         result = ((reg & CCM_ANALOG_PLL_VIDEO_ENABLE) != 0U);
         break;
     case kCLOCK_PllEnet:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_ENET);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_ENET);
         result = ((reg & CCM_ANALOG_PLL_ENET_BYPASS) != 0U);
         break;
     case kCLOCK_PllEnet25M:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_ENET);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_ENET);
         result = ((reg & CCM_ANALOG_PLL_ENET_BYPASS) != 0U);
         break;
     case kCLOCK_PllUsb2:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_USB2);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_USB2);
         result = ((reg & CCM_ANALOG_PLL_USB2_ENABLE) != 0U);
         break;     
     }
@@ -110,35 +110,35 @@ static inline bool CLOCK_IsPllBypassed(clock_pll_t pll)
     uint32_t reg = 0;
     switch(pll){    
     case kCLOCK_PllArm:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_ARM);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_ARM);
         result = (bool)(reg & CCM_ANALOG_PLL_ARM_BYPASS);
         break;
     case kCLOCK_PllSys:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_SYS);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_SYS);
         result = (bool)(reg & CCM_ANALOG_PLL_SYS_BYPASS);
         break;
     case kCLOCK_PllUsb1:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_USB1);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_USB1);
         result = (bool)(reg & CCM_ANALOG_PLL_USB1_BYPASS);
         break;
     case kCLOCK_PllAudio:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_AUDIO);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_AUDIO);
         result = (bool)(reg & CCM_ANALOG_PLL_AUDIO_BYPASS);
         break;
     case kCLOCK_PllVideo:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_VIDEO);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_VIDEO);
         result = (bool)(reg & CCM_ANALOG_PLL_VIDEO_BYPASS);
         break;
     case kCLOCK_PllEnet:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_ENET);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_ENET);
         result = (bool)(reg & CCM_ANALOG_PLL_ENET_BYPASS);
         break;
     case kCLOCK_PllEnet25M:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_ENET);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_ENET);
         result = (bool)(reg & CCM_ANALOG_PLL_ENET_BYPASS);
         break;
     case kCLOCK_PllUsb2:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_USB2);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_USB2);
         result = (bool)(reg & CCM_ANALOG_PLL_USB2_BYPASS);
         break;     
     }
@@ -159,7 +159,7 @@ static inline uint32_t CLOCK_GetOscFreq(void)
     uint32_t reg;
     #define XTALOSC24M_LOWPWR_CTRL 0x400d8270
     #define XTALOSC24M_LOWPWR_CTRL_OSC_SEL (1 << 4)
-    reg = getreg32(XTALOSC24M_LOWPWR_CTRL);
+    reg = READ_REG(XTALOSC24M_LOWPWR_CTRL);
 
     return ((reg & XTALOSC24M_LOWPWR_CTRL_OSC_SEL) != 0UL) ? 24000000UL : g_xtalFreq;
 }
@@ -176,28 +176,28 @@ static inline uint32_t CLOCK_GetPllBypassRefClk(clock_pll_t pll)
     uint32_t reg = 0;
     switch(pll){    
     case kCLOCK_PllArm:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_ARM);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_ARM);
         break;
     case kCLOCK_PllSys:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_SYS);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_SYS);
         break;
     case kCLOCK_PllUsb1:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_USB1);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_USB1);
         break;
     case kCLOCK_PllAudio:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_AUDIO);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_AUDIO);
         break;
     case kCLOCK_PllVideo:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_VIDEO);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_VIDEO);
         break;
     case kCLOCK_PllEnet:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_ENET);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_ENET);
         break;
     case kCLOCK_PllEnet25M:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_ENET);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_ENET);
         break;
     case kCLOCK_PllUsb2:
-        reg = getreg32(IMXRT_CCM_ANALOG_PLL_USB2);
+        reg = READ_REG(IMXRT_CCM_ANALOG_PLL_USB2);
         break;     
     }
     return (((reg & CCM_ANALOG_PLL_BYPASS_CLK_SRC_MASK) >>
@@ -229,19 +229,19 @@ static inline void CLOCK_SetMux(clock_mux_t mux, uint32_t value)
     {
         /* Wait until CCM internal handshake finish. */
         
-        while ((getreg32(IMXRT_CCM_CDHIPR) & ((1UL << busyShift))) != 0UL)
+        while ((READ_REG(IMXRT_CCM_CDHIPR) & ((1UL << busyShift))) != 0UL)
         {
         }
     }
 #endif
     switch(mux){
         case kCLOCK_SemcMux:
-            reg = getreg32(IMXRT_CCM_CBCDR);
+            reg = READ_REG(IMXRT_CCM_CBCDR);
             reg &= ~CCM_CBCDR_SEMC_CLK_SEL;
             reg |= CCM_CBCDR_SEMC_PODF(CCM_PODF_FROM_DIVISOR(value));
             putreg32(reg, IMXRT_CCM_CBCDR);
 
-            while ((getreg32(IMXRT_CCM_CDHIPR) & CCM_CDHIPR_SEMC_PODF_BUSY) != 0)
+            while ((READ_REG(IMXRT_CCM_CDHIPR) & CCM_CDHIPR_SEMC_PODF_BUSY) != 0)
             {
             }
             break;
@@ -264,7 +264,7 @@ static inline void CLOCK_SetDiv(clock_div_t divider, uint32_t value)
     if (CCM_NO_BUSY_WAIT != busyShift)
     {
         /* Wait until CCM internal handshake finish. */
-        while ((getreg32(IMXRT_CCM_CDHIPR) & ((uint32_t)(1UL << busyShift))) != 0UL)
+        while ((READ_REG(IMXRT_CCM_CDHIPR) & ((uint32_t)(1UL << busyShift))) != 0UL)
         {
         }
     }
@@ -272,19 +272,19 @@ static inline void CLOCK_SetDiv(clock_div_t divider, uint32_t value)
 
     switch(divider){
         case kCLOCK_SemcDiv:
-            reg = getreg32(IMXRT_CCM_CBCDR);
+            reg = READ_REG(IMXRT_CCM_CBCDR);
             reg &= ~CCM_CBCDR_SEMC_PODF_MASK;
             reg |= CCM_CBCDR_SEMC_PODF(CCM_PODF_FROM_DIVISOR(value));
             putreg32(reg, IMXRT_CCM_CBCDR);
 
-            while ((getreg32(IMXRT_CCM_CDHIPR) & CCM_CDHIPR_SEMC_PODF_BUSY) != 0)
+            while ((READ_REG(IMXRT_CCM_CDHIPR) & CCM_CDHIPR_SEMC_PODF_BUSY) != 0)
             {
             }
             break;
     }
 }
 
-uint32_t CLOCK_GetSemcFreq(void);
+//uint32_t CLOCK_GetSemcFreq(void);
 uint32_t CLOCK_GetPllFreq(clock_pll_t pll);
 uint32_t CLOCK_GetUsb1PfdFreq(clock_pfd_t pfd);
 uint32_t CLOCK_GetSysPfdFreq(clock_pfd_t pfd);

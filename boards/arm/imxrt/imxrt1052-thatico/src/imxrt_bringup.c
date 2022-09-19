@@ -39,7 +39,8 @@
 #endif
 
 #include "imxrt1052-thatico.h"
-
+#include "hardware/imxrt_ccm.h"
+#include "imxrt_common_drv.h"
 #include <arch/board/board.h>  /* Must always be included last */
 
 /****************************************************************************
@@ -84,6 +85,7 @@ static void imxrt_i2c_register(int bus)
 #ifdef CONFIG_IMXRT_USDHC
 static int nsh_sdmmc_initialize(void)
 {
+    syslog(LOG_INFO, "= = = = = = 1. %s\n", __func__);
   struct sdio_dev_s *sdmmc;
   int ret = 0;
 
@@ -128,7 +130,7 @@ static int nsh_sdmmc_initialize(void)
 int imxrt_bringup(void)
 {
   int ret;
-
+  syslog(LOG_INFO, "= = = = = = 1. %s\n", __func__);
   /* If we got here then perhaps not all initialization was successful, but
    * at least enough succeeded to bring-up NSH with perhaps reduced
    * capabilities.
@@ -185,6 +187,14 @@ int imxrt_bringup(void)
     }
 #endif
 
+syslog(LOG_INFO, "IMXRT_CCM_CBCDR %lx\n", READ_REG(IMXRT_CCM_CBCDR));
+syslog(LOG_INFO, "IMXRT_CCM_ANALOG_PLL_ARM %lx\n", READ_REG(IMXRT_CCM_ANALOG_PLL_ARM));
+syslog(LOG_INFO, "CLOCK_GetSemcFreq %ld\n", CLOCK_GetSemcFreq());
+syslog(LOG_INFO, "= = = = = = 2. %s\n", __func__);
   UNUSED(ret);
   return OK;
+
+
+
+
 }

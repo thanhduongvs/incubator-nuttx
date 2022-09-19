@@ -135,7 +135,7 @@
 #if defined(CONFIG_BOARDCTL) || defined(CONFIG_BOARD_LATE_INITIALIZE)
 int imxrt_bringup(void);
 #endif
-
+uint32_t CLOCK_GetSemcFreq(void);
 /****************************************************************************
  * Name: imxrt_spidev_initialize
  *

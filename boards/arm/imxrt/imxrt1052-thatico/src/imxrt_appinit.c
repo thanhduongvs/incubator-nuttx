@@ -29,7 +29,7 @@
 #include <nuttx/board.h>
 
 #include "imxrt1052-thatico.h"
-
+#include <syslog.h>
 #ifdef CONFIG_BOARDCTL
 
 /****************************************************************************
@@ -63,13 +63,16 @@
 
 int board_app_initialize(uintptr_t arg)
 {
+  syslog(LOG_INFO, "= = = = = = 1. %s\n", __func__);
 #ifndef CONFIG_BOARD_LATE_INITIALIZE
   /* Perform board initialization */
-
+  syslog(LOG_INFO, "= = = = = = 2. %s\n", __func__);
   return imxrt_bringup();
 #else
+syslog(LOG_INFO, "= = = = = = 21. %s\n", __func__);
   return OK;
 #endif
+
 }
 
 #endif /* CONFIG_BOARDCTL */
