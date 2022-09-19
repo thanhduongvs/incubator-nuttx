@@ -1,6 +1,7 @@
 #include "imxrt_semc_drv.h"
 #include <assert.h>
 #include <string.h>
+#include <syslog.h>
 
 /*! @brief Pointers to SEMC bases for each instance. */
 //static SEMC_Type *const s_semcBases[] = SEMC_BASE_PTRS;
@@ -207,7 +208,7 @@ void SEMC_Init(semc_config_t *configure)
 
     //uint8_t index = 0;
     uint32_t value;
-
+    syslog(LOG_INFO, "SEMC_Init1\n");
 #if !(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL)
     /* Un-gate sdram controller clock. */
     CLOCK_EnableClock(s_semcClock[SEMC_GetInstance()]);
@@ -215,13 +216,14 @@ void SEMC_Init(semc_config_t *configure)
     CLOCK_EnableClock(s_semcExtClock[SEMC_GetInstance()]);
 #endif /* SEMC_EXSC_CLOCKS */
 #endif /* FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL */
-
+syslog(LOG_INFO, "SEMC_Init2\n");
     /* Initialize all BR to zero due to the default base address set. */
     /*
     for (index = 0; index < SEMC_BR_REG_NUM; index++)
     {
         base->BR[index] = 0;
     }*/
+    syslog(LOG_INFO, "SEMC_Init21\n");
     WRITE_REG(IMXRT_SEMC_BR0, 0x00);
     WRITE_REG(IMXRT_SEMC_BR1, 0x00);
     WRITE_REG(IMXRT_SEMC_BR2, 0x00);
@@ -232,14 +234,14 @@ void SEMC_Init(semc_config_t *configure)
     WRITE_REG(IMXRT_SEMC_BR7, 0x00);
     WRITE_REG(IMXRT_SEMC_BR8, 0x00);
 
-
+syslog(LOG_INFO, "SEMC_Init3\n");
     /* Software reset for SEMC internal logical . */
     //base->MCR = SEMC_MCR_SWRST_MASK;
     WRITE_REG(IMXRT_SEMC_MCR, SEMC_MCR_SWRST_MASK);
     while ((READ_REG(IMXRT_SEMC_MCR) & (uint32_t)SEMC_MCR_SWRST_MASK) != 0x00U)
     {
     }
-
+syslog(LOG_INFO, "SEMC_Init4\n");
     /* Configure, disable module first. */
     /*
     base->MCR |= SEMC_MCR_MDIS_MASK | SEMC_MCR_BTO(configure->busTimeoutCycles) |
@@ -277,6 +279,7 @@ void SEMC_Init(semc_config_t *configure)
     /* Enable SEMC. */
     //base->MCR &= ~SEMC_MCR_MDIS_MASK;
     CLEAR_BIT(IMXRT_SEMC_MCR, SEMC_MCR_MDIS_MASK);
+    syslog(LOG_INFO, "SEMC_Init NN\n");
 }
 
 status_t SEMC_ConfigureSDRAM(semc_sdram_cs_t cs, semc_sdram_config_t *config, uint32_t clkSrc_Hz)
@@ -284,6 +287,7 @@ status_t SEMC_ConfigureSDRAM(semc_sdram_cs_t cs, semc_sdram_config_t *config, ui
     assert(config != NULL);
     assert(clkSrc_Hz > 0x00U);
     assert(config->refreshBurstLen > 0x00U);
+    syslog(LOG_INFO, "SEMC_ConfigureSDRAM\n");
 
     uint8_t memsize;
     status_t result   = kStatus_Success;
@@ -297,16 +301,19 @@ status_t SEMC_ConfigureSDRAM(semc_sdram_cs_t cs, semc_sdram_config_t *config, ui
 
     if ((config->address < SEMC_STARTADDRESS) || (config->address > SEMC_ENDADDRESS))
     {
+        //syslog(LOG_INFO, "SEMC_ConfigureSDRAM1\n");
         return kStatus_SEMC_InvalidBaseAddress;
     }
 
     if (config->csxPinMux == kSEMC_MUXA8)
     {
+        //syslog(LOG_INFO, "SEMC_ConfigureSDRAM2\n");
         return kStatus_SEMC_InvalidSwPinmuxSelection;
     }
 
     if (prescale > 256U)
     {
+        //syslog(LOG_INFO, "SEMC_ConfigureSDRAM3\n");
         return kStatus_SEMC_InvalidTimerSetting;
     }
 
@@ -324,36 +331,46 @@ status_t SEMC_ConfigureSDRAM(semc_sdram_cs_t cs, semc_sdram_config_t *config, ui
     result = SEMC_CovertMemorySize(config->memsize_kbytes, &memsize);
     if (result != kStatus_Success)
     {
+        //syslog(LOG_INFO, "SEMC_ConfigureSDRAM4\n");
         return result;
     }
 
     //base->BR[cs] = (config->address & SEMC_BR_BA_MASK) | SEMC_BR_MS(memsize) | SEMC_BR_VLD_MASK;
     value = (config->address & SEMC_BR_BA_MASK) | SEMC_BR_MS(memsize) | SEMC_BR_VLD_MASK;
+    //syslog(LOG_INFO, "SEMC_ConfigureSDRAM5\n");
     switch (cs) {
         case kSEMC_SDRAM_CS0:
             WRITE_REG(IMXRT_SEMC_BR0, value);
+            //syslog(LOG_INFO, "SEMC_ConfigureSDRAM6\n");
             break;
         case kSEMC_SDRAM_CS1:
             WRITE_REG(IMXRT_SEMC_BR1, value);
+            //syslog(LOG_INFO, "SEMC_ConfigureSDRAM7\n");
             break;
         case kSEMC_SDRAM_CS2:
             WRITE_REG(IMXRT_SEMC_BR2, value);
+            //syslog(LOG_INFO, "SEMC_ConfigureSDRAM8\n");
             break;
         case kSEMC_SDRAM_CS3:
             WRITE_REG(IMXRT_SEMC_BR3, value);
+            //syslog(LOG_INFO, "SEMC_ConfigureSDRAM9\n");
             break;
     }
 
 #if defined(FSL_FEATURE_SEMC_SDRAM_SUPPORT_COLUMN_ADDRESS_8BIT) && (FSL_FEATURE_SEMC_SDRAM_SUPPORT_COLUMN_ADDRESS_8BIT)
+    //syslog(LOG_INFO, "SEMC_ConfigureSDRAM10\n");
     if (kSEMC_SdramColunm_8bit == config->columnAddrBitNum)
     {
+        //syslog(LOG_INFO, "SEMC_ConfigureSDRAM11\n");
         base->SDRAMCR0 = SEMC_SDRAMCR0_PS(config->portSize) | SEMC_SDRAMCR0_BL(config->burstLen) |
                          SEMC_SDRAMCR0_COL8(true) | SEMC_SDRAMCR0_CL(config->casLatency);
     }
     else
 #endif /* FSL_FEATURE_SEMC_SDRAM_SUPPORT_COLUMN_ADDRESS_8BIT */
     {
+        //syslog(LOG_INFO, "SEMC_ConfigureSDRAM12\n");
         /*
+        syslog(LOG_INFO, "SEMC_ConfigureSDRAM1\n");
         base->SDRAMCR0 = SEMC_SDRAMCR0_PS(config->portSize) | SEMC_SDRAMCR0_BL(config->burstLen) |
                          SEMC_SDRAMCR0_COL(config->columnAddrBitNum) | SEMC_SDRAMCR0_CL(config->casLatency);*/
         value = SEMC_SDRAMCR0_PS(config->portSize) | SEMC_SDRAMCR0_BL(config->burstLen) |
@@ -364,6 +381,7 @@ status_t SEMC_ConfigureSDRAM(semc_sdram_cs_t cs, semc_sdram_config_t *config, ui
     /* IOMUX setting. */
     if (cs != kSEMC_SDRAM_CS0)
     {
+        //syslog(LOG_INFO, "SEMC_ConfigureSDRAM13\n");
         //base->IOCR = iocReg | ((uint32_t)cs << (uint32_t)config->csxPinMux);
         value = iocReg | ((uint32_t)cs << (uint32_t)config->csxPinMux);
         WRITE_REG(IMXRT_SEMC_IOCR, value);
@@ -373,13 +391,14 @@ status_t SEMC_ConfigureSDRAM(semc_sdram_cs_t cs, semc_sdram_config_t *config, ui
     CLEAR_BIT(IMXRT_SEMC_IOCR, SEMC_IOCR_MUX_A8_MASK);
 
 #if defined(FSL_FEATURE_SEMC_HAS_DELAY_CHAIN_CONTROL) && (FSL_FEATURE_SEMC_HAS_DELAY_CHAIN_CONTROL)
+//syslog(LOG_INFO, "SEMC_ConfigureSDRAM14\n");
     uint32_t tempDelayChain = base->DCCR;
 
     tempDelayChain &= ~(SEMC_DCCR_SDRAMVAL_MASK | SEMC_DCCR_SDRAMEN_MASK);
     /* Configure delay chain. */
     base->DCCR = tempDelayChain | SEMC_DCCR_SDRAMVAL((uint32_t)config->delayChain - 0x01U) | SEMC_DCCR_SDRAMEN_MASK;
 #endif /* FSL_FEATURE_SEMC_HAS_DELAY_CHAIN_CONTROL */
-
+//syslog(LOG_INFO, "SEMC_ConfigureSDRAM15\n");
     timing = SEMC_SDRAMCR1_PRE2ACT(SEMC_ConvertTiming(config->tPrecharge2Act_Ns, clkSrc_Hz));
     timing |= SEMC_SDRAMCR1_ACT2RW(SEMC_ConvertTiming(config->tAct2ReadWrite_Ns, clkSrc_Hz));
     timing |= SEMC_SDRAMCR1_RFRC(SEMC_ConvertTiming(config->tRefreshRecovery_Ns, clkSrc_Hz));

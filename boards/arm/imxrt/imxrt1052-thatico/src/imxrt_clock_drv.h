@@ -9,7 +9,7 @@
 
 #include "imxrt_clock_type.h"
 #include "imxrt_common_drv.h"
-
+#include <syslog.h>
 
 /*! @brief External XTAL (24M OSC/SYSOSC) clock frequency.
  *
@@ -159,9 +159,13 @@ static inline uint32_t CLOCK_GetOscFreq(void)
     uint32_t reg;
     #define XTALOSC24M_LOWPWR_CTRL 0x400d8270
     #define XTALOSC24M_LOWPWR_CTRL_OSC_SEL (1 << 4)
+    //syslog(LOG_INFO, "enter CLOCK_GetOscFreq\n");
     reg = READ_REG(XTALOSC24M_LOWPWR_CTRL);
+    //syslog(LOG_INFO, "XTALOSC24M_LOWPWR_CTRL: 0x%lx\n", reg);
+    //syslog(LOG_INFO, "bit OSC_SEL: 0x%lx\n", (reg & XTALOSC24M_LOWPWR_CTRL_OSC_SEL));
 
-    return ((reg & XTALOSC24M_LOWPWR_CTRL_OSC_SEL) != 0UL) ? 24000000UL : g_xtalFreq;
+    //return ((reg & XTALOSC24M_LOWPWR_CTRL_OSC_SEL) != 0UL) ? 24000000UL : g_xtalFreq;
+    return ((reg & XTALOSC24M_LOWPWR_CTRL_OSC_SEL) == 0UL) ? 24000000UL : g_xtalFreq;
 }
 
 /*!
@@ -173,10 +177,15 @@ static inline uint32_t CLOCK_GetOscFreq(void)
  */
 static inline uint32_t CLOCK_GetPllBypassRefClk(clock_pll_t pll)
 {
+    //CLOCK_GetPllBypassRefClk
+    
+    uint32_t temp;
     uint32_t reg = 0;
+    //syslog(LOG_INFO, "xxxxxxxxx enter CLOCK_GetPllBypassRefClk\n");
     switch(pll){    
     case kCLOCK_PllArm:
         reg = READ_REG(IMXRT_CCM_ANALOG_PLL_ARM);
+        //syslog(LOG_INFO, "enter IMXRT_CCM_ANALOG_PLL_ARM 0x%lx\n", reg);
         break;
     case kCLOCK_PllSys:
         reg = READ_REG(IMXRT_CCM_ANALOG_PLL_SYS);
@@ -200,6 +209,8 @@ static inline uint32_t CLOCK_GetPllBypassRefClk(clock_pll_t pll)
         reg = READ_REG(IMXRT_CCM_ANALOG_PLL_USB2);
         break;     
     }
+    temp = ((reg & CCM_ANALOG_PLL_BYPASS_CLK_SRC_MASK) >> CCM_ANALOG_PLL_BYPASS_CLK_SRC_SHIFT);
+    //syslog(LOG_INFO, "enter2 0x%lx\n", temp);
     return (((reg & CCM_ANALOG_PLL_BYPASS_CLK_SRC_MASK) >>
              CCM_ANALOG_PLL_BYPASS_CLK_SRC_SHIFT) == (uint32_t)kCLOCK_PllClkSrc24M) ?
                CLOCK_GetOscFreq() :
@@ -284,7 +295,7 @@ static inline void CLOCK_SetDiv(clock_div_t divider, uint32_t value)
     }
 }
 
-//uint32_t CLOCK_GetSemcFreq(void);
+uint32_t CLOCK_GetSemcFreq(void);
 uint32_t CLOCK_GetPllFreq(clock_pll_t pll);
 uint32_t CLOCK_GetUsb1PfdFreq(clock_pfd_t pfd);
 uint32_t CLOCK_GetSysPfdFreq(clock_pfd_t pfd);

@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 #include "imxrt_common_drv.h"
 
 #ifndef NULL
