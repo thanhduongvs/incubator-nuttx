@@ -40,6 +40,8 @@
 
 #include "imxrt1052-thatico.h"
 #include "hardware/imxrt_ccm.h"
+#include "imxrt_periphclks.h"
+#include "hardware/imxrt_pinmux.h"
 #include "imxrt_common_drv.h"
 #include <arch/board/board.h>  /* Must always be included last */
 
@@ -58,6 +60,97 @@
 /****************************************************************************
  * Private Functions
  ****************************************************************************/
+
+
+#define GPIO_SEMC_DATA00    (GPIO_SEMC_DATA00_1)
+#define GPIO_SEMC_DATA01    GPIO_SEMC_DATA01_1
+#define GPIO_SEMC_DATA02    GPIO_SEMC_DATA02_1
+#define GPIO_SEMC_DATA03    GPIO_SEMC_DATA03_1
+#define GPIO_SEMC_DATA04    GPIO_SEMC_DATA04_1
+#define GPIO_SEMC_DATA05    GPIO_SEMC_DATA05_1
+#define GPIO_SEMC_DATA06    GPIO_SEMC_DATA06_1
+#define GPIO_SEMC_DATA07    GPIO_SEMC_DATA07_1
+#define GPIO_SEMC_DM00      GPIO_SEMC_DM00_1
+#define GPIO_SEMC_WE        GPIO_SEMC_WE_1
+#define GPIO_SEMC_CAS       GPIO_SEMC_CAS_1
+#define GPIO_SEMC_RAS       GPIO_SEMC_RAS_1
+#define GPIO_SEMC_CS0       GPIO_SEMC_CS0_1
+#define GPIO_SEMC_BA0       GPIO_SEMC_BA0_1
+#define GPIO_SEMC_BA1       GPIO_SEMC_BA1_1
+#define GPIO_SEMC_ADDR10    GPIO_SEMC_ADDR10_1
+#define GPIO_SEMC_ADDR00    GPIO_SEMC_ADDR00_1
+#define GPIO_SEMC_ADDR01    GPIO_SEMC_ADDR01_1
+#define GPIO_SEMC_ADDR02    GPIO_SEMC_ADDR02_1
+#define GPIO_SEMC_ADDR03    GPIO_SEMC_ADDR03_1
+#define GPIO_SEMC_ADDR04    GPIO_SEMC_ADDR04_1
+#define GPIO_SEMC_ADDR05    GPIO_SEMC_ADDR05_1
+#define GPIO_SEMC_ADDR06    GPIO_SEMC_ADDR06_1
+#define GPIO_SEMC_ADDR07    GPIO_SEMC_ADDR07_1
+#define GPIO_SEMC_ADDR08    GPIO_SEMC_ADDR08_1
+#define GPIO_SEMC_ADDR09    GPIO_SEMC_ADDR09_1
+#define GPIO_SEMC_ADDR11    GPIO_SEMC_ADDR11_1
+#define GPIO_SEMC_ADDR12    GPIO_SEMC_ADDR12_1
+#define GPIO_SEMC_DQS       GPIO_SEMC_DQS_1
+#define GPIO_SEMC_CKE       GPIO_SEMC_CKE_1
+#define GPIO_SEMC_CLK       GPIO_SEMC_CLK_1
+#define GPIO_SEMC_DM01      GPIO_SEMC_DM01_1
+#define GPIO_SEMC_DATA08    GPIO_SEMC_DATA08_1
+#define GPIO_SEMC_DATA09    GPIO_SEMC_DATA09_1
+#define GPIO_SEMC_DATA10    GPIO_SEMC_DATA10_1
+#define GPIO_SEMC_DATA11    GPIO_SEMC_DATA11_1
+#define GPIO_SEMC_DATA12    GPIO_SEMC_DATA12_1
+#define GPIO_SEMC_DATA13    GPIO_SEMC_DATA13_1
+#define GPIO_SEMC_DATA14    GPIO_SEMC_DATA14_1
+#define GPIO_SEMC_DATA15    GPIO_SEMC_DATA15_1
+#define GPIO_SEMC_CSX00     GPIO_SEMC_CSX00_1
+#define GPIO_SEMC_RDY       GPIO_SEMC_RDY_1
+
+void imxrt_semc_io_init(void)
+{
+  imxrt_config_gpio(GPIO_SEMC_DATA00);
+  imxrt_config_gpio(GPIO_SEMC_DATA01);
+  imxrt_config_gpio(GPIO_SEMC_DATA02);
+  imxrt_config_gpio(GPIO_SEMC_DATA03);
+  imxrt_config_gpio(GPIO_SEMC_DATA04);
+  imxrt_config_gpio(GPIO_SEMC_DATA05);
+  imxrt_config_gpio(GPIO_SEMC_DATA06);
+  imxrt_config_gpio(GPIO_SEMC_DATA07);
+  imxrt_config_gpio(GPIO_SEMC_DM00);
+  imxrt_config_gpio(GPIO_SEMC_WE);
+  imxrt_config_gpio(GPIO_SEMC_CAS);
+  imxrt_config_gpio(GPIO_SEMC_RAS);
+  imxrt_config_gpio(GPIO_SEMC_CS0);
+  imxrt_config_gpio(GPIO_SEMC_BA0);
+  imxrt_config_gpio(GPIO_SEMC_BA1);
+  imxrt_config_gpio(GPIO_SEMC_ADDR10);
+  imxrt_config_gpio(GPIO_SEMC_ADDR00);
+  imxrt_config_gpio(GPIO_SEMC_ADDR01);
+  imxrt_config_gpio(GPIO_SEMC_ADDR02);
+  imxrt_config_gpio(GPIO_SEMC_ADDR03);
+  imxrt_config_gpio(GPIO_SEMC_ADDR04);
+  imxrt_config_gpio(GPIO_SEMC_ADDR05);
+  imxrt_config_gpio(GPIO_SEMC_ADDR06);
+  imxrt_config_gpio(GPIO_SEMC_ADDR07);
+  imxrt_config_gpio(GPIO_SEMC_ADDR08);
+  imxrt_config_gpio(GPIO_SEMC_ADDR09);
+  imxrt_config_gpio(GPIO_SEMC_ADDR11);
+  imxrt_config_gpio(GPIO_SEMC_ADDR12);
+  imxrt_config_gpio(GPIO_SEMC_DQS);
+  imxrt_config_gpio(GPIO_SEMC_CKE);
+  imxrt_config_gpio(GPIO_SEMC_CLK);
+  imxrt_config_gpio(GPIO_SEMC_DM01);
+  imxrt_config_gpio(GPIO_SEMC_DATA08);
+  imxrt_config_gpio(GPIO_SEMC_DATA09);
+  imxrt_config_gpio(GPIO_SEMC_DATA10);
+  imxrt_config_gpio(GPIO_SEMC_DATA11);
+  imxrt_config_gpio(GPIO_SEMC_DATA12);
+  imxrt_config_gpio(GPIO_SEMC_DATA13);
+  imxrt_config_gpio(GPIO_SEMC_DATA14);
+  imxrt_config_gpio(GPIO_SEMC_DATA15);
+  imxrt_config_gpio(GPIO_SEMC_CSX00);
+  imxrt_config_gpio(GPIO_SEMC_RDY);
+  imxrt_clockall_semc();
+}
 
 #if defined(CONFIG_I2C_DRIVER) && defined(CONFIG_IMXRT_LPI2C)
 static void imxrt_i2c_register(int bus)
@@ -187,16 +280,13 @@ int imxrt_bringup(void)
     }
 #endif
 
-syslog(LOG_INFO, "IMXRT_CCM_CBCDR %lx\n", READ_REG(IMXRT_CCM_CBCDR));
-syslog(LOG_INFO, "IMXRT_CCM_ANALOG_PLL_ARM %lx\n", READ_REG(IMXRT_CCM_ANALOG_PLL_ARM));
-init_semc_sdram();
-SEMC_SDRAMReadWrite8Bit();
-//syslog(LOG_INFO, "CLOCK_GetSemcFreq %ld\n", CLOCK_GetSemcFreq());
-syslog(LOG_INFO, "= = = = = = 22. %s\n", __func__);
+  syslog(LOG_INFO, "IMXRT_CCM_CBCDR %lx\n", READ_REG(IMXRT_CCM_CBCDR));
+  syslog(LOG_INFO, "IMXRT_CCM_ANALOG_PLL_ARM %lx\n", READ_REG(IMXRT_CCM_ANALOG_PLL_ARM));
+  imxrt_semc_io_init();
+  init_semc_sdram();
+  SEMC_SDRAMReadWrite8Bit();
+  //syslog(LOG_INFO, "CLOCK_GetSemcFreq %ld\n", CLOCK_GetSemcFreq());
+  syslog(LOG_INFO, "= = = = = = 22. %s\n", __func__);
   UNUSED(ret);
   return OK;
-
-
-
-
 }

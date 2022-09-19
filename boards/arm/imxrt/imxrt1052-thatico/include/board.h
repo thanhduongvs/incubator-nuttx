@@ -189,6 +189,8 @@
 
 #define BUTTON_SW8_BIT    (1 << BUTTON_SW8)
 
+
+ 
 /* SDIO *********************************************************************/
 
 /* Pin drive characteristics - drive strength in particular may need tuning
